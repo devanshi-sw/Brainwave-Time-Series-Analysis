@@ -11,8 +11,8 @@ This repository contains code and analysis for studying the relationship between
 - Visualization: Plotting EEG frequencies and their interactions with stimuli and participant gender.
 
 # Project Setup
-git clone https://github.com/EEG-Time-Series-Analysis.git
-pip install -r requirements.txt
+- git clone https://github.com/EEG-Time-Series-Analysis.git
+- pip install -r requirements.txt
 - python eeg_preprocessing.py: Preprocess the EEG time series data.
 - python eeg_regression_analysis.py: Run regression models to evaluate the relationships between brainwave activity and preferences.
 - python aic_model_comparison.py: Perform AIC-based model comparison.
