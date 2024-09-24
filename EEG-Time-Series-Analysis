@@ -1,1 +1,98 @@
+## Preprocessing the EEG Time Series Data
+import pandas as pd
+import numpy as np
 
+# Load EEG data 
+df = pd.read_csv('eeg_data.csv')
+
+#  Removing missing data, normalizing EEG values, and creating necessary columns
+# Drop any rows with missing values
+df.dropna(inplace=True)
+
+# Normalize EEG frequencies (Delta, Theta, Beta, Gamma) for better analysis
+df['Delta_norm'] = (df['Delta'] - df['Delta'].mean()) / df['Delta'].std()
+df['Theta_norm'] = (df['Theta'] - df['Theta'].mean()) / df['Theta'].std()
+df['Beta_norm'] = (df['Beta'] - df['Beta'].mean()) / df['Beta'].std()
+df['Gamma_norm'] = (df['Gamma'] - df['Gamma'].mean()) / df['Gamma'].std()
+
+# Save the preprocessed data 
+df.to_csv('preprocessed_eeg_data.csv', index=False)
+
+print("Preprocessing complete. Preprocessed data saved to 'preprocessed_eeg_data.csv'.")
+
+##Regression Models to Evaluate Relationships
+import statsmodels.api as sm
+
+# Load preprocessed EEG data
+df = pd.read_csv('preprocessed_eeg_data.csv')
+
+# Define predictors and response variable (Assuming 'preference' is the outcome variable)
+X = df[['Delta_norm', 'Theta_norm', 'Beta_norm', 'Gamma_norm', 'Gender', 'dimension1', 'dimension2']]
+X = sm.add_constant(X)  # Add an intercept
+y = df['preference'] 
+
+# Fit the regression model
+model = sm.OLS(y, X).fit()
+
+# Output the regression summary
+print(model.summary())
+
+# Save model
+with open('regression_results.txt', 'w') as f:
+    f.write(model.summary().as_text())
+
+AIC-Based Model Comparison (originally used R in project)
+import pandas as pd
+import statsmodels.api as sm
+
+# Load preprocessed EEG data
+df = pd.read_csv('preprocessed_eeg_data.csv')
+
+# Define predictors for Model 1 (You can adjust the predictors based on your hypothesis)
+X1 = df[['Delta_norm', 'Theta_norm', 'Beta_norm', 'Gender']]
+X1 = sm.add_constant(X1)  # Add an intercept
+y = df['preference']
+
+# Fit Model 1
+model1 = sm.OLS(y, X1).fit()
+
+# Define predictors for Model 2 (Different combinations of predictors)
+X2 = df[['Delta_norm', 'Theta_norm', 'Gamma_norm', 'dimension1', 'dimension2']]
+X2 = sm.add_constant(X2)
+
+# Fit Model 2
+model2 = sm.OLS(y, X2).fit()
+
+# Print AIC values for both models
+print(f"Model 1 AIC: {model1.aic}")
+print(f"Model 2 AIC: {model2.aic}")
+
+# Save AIC comparison
+with open('aic_comparison.txt', 'w') as f:
+    f.write(f"Model 1 AIC: {model1.aic}\n")
+    f.write(f"Model 2 AIC: {model2.aic}\n")
+
+print("AIC model comparison complete. Results saved to 'aic_comparison.txt'.")
+
+##Plotting EEG Frequencies and Stimuli
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load preprocessed EEG data
+df = pd.read_csv('preprocessed_eeg_data.csv')
+
+# Scatter plot for EEG frequencies and preferences (color-coded by gender)
+sns.scatterplot(x='Theta_norm', y='preference', hue='Gender', data=df)
+plt.title('Theta Frequency vs. Preference (Colored by Gender)')
+plt.xlabel('Theta (Normalized)')
+plt.ylabel('Preference')
+plt.show()
+
+# Bar plot for gender-based preferences and EEG frequencies (Beta)
+sns.barplot(x='Gender', y='preference', hue='Beta_norm', data=df)
+plt.title('Preferences by Gender and Beta Frequency')
+plt.show()
+
+# Save the visualizations (optional)
+plt.savefig('eeg_preference_visualization.png')
